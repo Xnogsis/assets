@@ -1,0 +1,24 @@
+name: Sync gn-math upstream
+
+on:
+  schedule:
+    # Leave an hour before larp.garden's catalog refresh.
+    - cron: "45 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge upstream without overwriting fork changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORK_REPOSITORY: ${{ github.repository }}
+        run: gh api --method POST "repos/$FORK_REPOSITORY/merge-upstream" -f branch=main
